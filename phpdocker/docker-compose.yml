@@ -1,0 +1,33 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+
+mysqlt:
+  image: mysql:5.7
+  container_name: mysqlt
+  environment:
+    - MYSQL_ROOT_PASSWORD=1
+    - MYSQL_DATABASE=test
+    - MYSQL_USER=admin
+    - MYSQL_PASSWORD=1
+
+test-webserver:
+  image: phpdockerio/nginx:latest
+  container_name: test-webserver
+  volumes:
+      - ..:/var/www/test
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+  ports:
+   - "8080:80"
+  links:
+   - test-php-fpm
+
+test-php-fpm:
+  build: .
+  dockerfile: php-fpm/Dockerfile
+  container_name: test-php-fpm
+  volumes:
+    - ..:/var/www/test
+    - ./php-fpm/php-ini-overrides.ini:/etc/php/7.1/fpm/conf.d/99-overrides.ini
+  links:
+    - mysqlt
